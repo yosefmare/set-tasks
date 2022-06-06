@@ -5,6 +5,15 @@ let tasksDiv = document.querySelector(".tasks");
 // Empty Array To Store The Tasks
 let arrayOfTasks = [];
 
+// check if there tasks in storage
+if (localStorage.getItem("tasks")) {
+    arrayOfTasks = JSON.parse(localStorage.getItem("tasks"))
+}
+
+
+// trigger
+getStorageData()
+
 // Add Task
 submit.onclick = function () {
 if (input.value !== "") {
@@ -12,6 +21,24 @@ if (input.value !== "") {
     input.value = ""; // Empty Input Field
 }
 };
+
+
+// click on task element
+tasksDiv.addEventListener("click" , (e) =>{
+    if (e.target.classList.contains("del")) {
+        // remove tasks from storage
+        deleteTasks(e.target.parentElement.getAttribute("data-id"))
+        // remove element from page
+        e.target.parentElement.remove()
+    }
+        //task element
+        if(e.target.classList.contains("task")){
+            // complete task
+            toggleStatus(e.target.getAttribute("data-id"))
+            // toggle class
+            e.target.classList.toggle("done")
+        }
+})
 
 
 function addTaskToArray(taskText) {
@@ -58,4 +85,26 @@ function addElementsToPageFrom(arrayOfTasks){
 
 function addDataToLocal(arrayOfTasks){
     window.localStorage.setItem("tasks" , JSON.stringify(arrayOfTasks))
+}
+
+function getStorageData(){
+    let data = window.localStorage.getItem("tasks");
+    if (data) {
+        let tasks = JSON.parse(data);
+        addElementsToPageFrom(tasks)
+    }
+}
+
+function deleteTasks(taskId){
+    arrayOfTasks = arrayOfTasks.filter((task) => task.id != taskId )
+    addDataToLocal(arrayOfTasks)
+}
+
+function toggleStatus(taskId){
+    for (let i = 0; i < arrayOfTasks.length; i++) {
+        if (arrayOfTasks[i].id == taskId) {
+            arrayOfTasks[i].completed == false ?  (arrayOfTasks[i].completed = true) : (arrayOfTasks[i].completed = false)
+        }
+    }
+    addDataToLocal(arrayOfTasks)
 }
